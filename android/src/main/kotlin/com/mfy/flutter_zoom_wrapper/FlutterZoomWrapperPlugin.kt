@@ -173,7 +173,8 @@ private fun joinMeeting(meetingId: String?, password: String?, displayName: Stri
     val options = JoinMeetingOptions().apply {
       // Hide password, meeting ID, and invite link from meeting info popup
       meeting_views_options = MeetingViewsOptions.NO_TEXT_PASSWORD or 
-                              MeetingViewsOptions.NO_TEXT_MEETING_ID
+                              MeetingViewsOptions.NO_TEXT_MEETING_ID or
+                              MeetingViewsOptions.NO_TEXT_INVITE_LINK
       
       no_invite = true
       no_share = true
