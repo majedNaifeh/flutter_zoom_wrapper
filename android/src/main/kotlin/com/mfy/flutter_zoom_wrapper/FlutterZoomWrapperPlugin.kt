@@ -180,6 +180,7 @@ private fun joinMeeting(meetingId: String?, password: String?, displayName: Stri
         MeetingViewsOptions.NO_BUTTON_PARTICIPANTS
     no_invite = true
     no_share = true
+     no_titlebar = true
     invite_options = InviteOptions.INVITE_DISABLE_ALL
    
 }
