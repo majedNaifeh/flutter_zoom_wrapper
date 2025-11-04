@@ -170,6 +170,9 @@ private fun joinMeeting(meetingId: String?, password: String?, displayName: Stri
       this.displayName = displayName
     }
 
+    val meetingService = ZoomSDK.getInstance().inMeetingService
+meetingService.disableCopyMeetingUrl(true)
+
    val options = JoinMeetingOptions().apply {
     meeting_views_options = 
         MeetingViewsOptions.NO_TEXT_MEETING_ID or
