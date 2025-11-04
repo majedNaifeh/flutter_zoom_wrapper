@@ -155,8 +155,7 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
 
 
 
-
-  private fun joinMeeting(meetingId: String?, password: String?, displayName: String?, result: Result) {
+private fun joinMeeting(meetingId: String?, password: String?, displayName: String?, result: Result) {
     if (!zoomSDK.isInitialized) {
       result.error("SDK_NOT_INITIALIZED", "Zoom SDK not initialized", null)
       return
@@ -173,7 +172,11 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
       this.displayName = displayName
     }
 
-    val options = JoinMeetingOptions()
+    // ✅ THIS WILL HIDE PASSWORD AND INVITE LINK
+    val options = JoinMeetingOptions().apply {
+      meeting_views_options = MeetingViewsOptions.NO_TEXT_PASSWORD  // Hides password
+      no_invite = true  // Removes invite button/link
+    }
 
     val meetingService = zoomSDK.meetingService
     activityBinding?.activity?.let {
@@ -184,7 +187,6 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
 
     result.success(true)
   }
-
   override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
     when (errorCode) {
       ZoomError.ZOOM_ERROR_SUCCESS -> {
