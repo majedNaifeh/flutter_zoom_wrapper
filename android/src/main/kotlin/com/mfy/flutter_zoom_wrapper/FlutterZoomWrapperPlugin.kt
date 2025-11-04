@@ -174,7 +174,8 @@ private fun joinMeeting(meetingId: String?, password: String?, displayName: Stri
       // Hide password, meeting ID, and invite link from meeting info popup
       meeting_views_options = MeetingViewsOptions.NO_TEXT_PASSWORD or 
                               MeetingViewsOptions.NO_TEXT_MEETING_ID or
-                              MeetingViewsOptions.NO_TEXT_INVITE_LINK
+                              MeetingViewsOptions.NO_BUTTON_MORE or
+                              MeetingViewsOptions.NO_BUTTON_PARTICIPANTS
       
       no_invite = true
       no_share = true
