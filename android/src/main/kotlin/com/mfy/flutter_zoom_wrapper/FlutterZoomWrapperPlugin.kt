@@ -179,7 +179,7 @@ private fun joinMeeting(meetingId: String?, password: String?, displayName: Stri
       
       no_invite = true
       no_share = true
-
+invite_options = 0 
   invite_options = InviteOptions.INVITE_DISABLE_ALL
 
     }
