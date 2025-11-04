@@ -153,8 +153,6 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
     }
   }
 
-
-
 private fun joinMeeting(meetingId: String?, password: String?, displayName: String?, result: Result) {
     if (!zoomSDK.isInitialized) {
       result.error("SDK_NOT_INITIALIZED", "Zoom SDK not initialized", null)
@@ -172,10 +170,13 @@ private fun joinMeeting(meetingId: String?, password: String?, displayName: Stri
       this.displayName = displayName
     }
 
-    // ✅ THIS WILL HIDE PASSWORD AND INVITE LINK
     val options = JoinMeetingOptions().apply {
-      meeting_views_options = MeetingViewsOptions.NO_TEXT_PASSWORD  // Hides password
-      no_invite = true  // Removes invite button/link
+      // Hide password, meeting ID, and invite link from meeting info popup
+      meeting_views_options = MeetingViewsOptions.NO_TEXT_PASSWORD or 
+                              MeetingViewsOptions.NO_TEXT_MEETING_ID
+      
+      no_invite = true
+      no_share = true
     }
 
     val meetingService = zoomSDK.meetingService
