@@ -170,19 +170,19 @@ private fun joinMeeting(meetingId: String?, password: String?, displayName: Stri
       this.displayName = displayName
     }
 
-    val options = JoinMeetingOptions().apply {
-      // Hide password, meeting ID, and invite link from meeting info popup
-      meeting_views_options = MeetingViewsOptions.NO_TEXT_PASSWORD or 
-                              MeetingViewsOptions.NO_TEXT_MEETING_ID or
-                              MeetingViewsOptions.NO_BUTTON_MORE or
-                              MeetingViewsOptions.NO_BUTTON_PARTICIPANTS
-      
-      no_invite = true
-      no_share = true
-invite_options = 0 
-  invite_options = InviteOptions.INVITE_DISABLE_ALL
-
-    }
+   val options = JoinMeetingOptions().apply {
+    meeting_views_options = 
+        MeetingViewsOptions.NO_TEXT_MEETING_ID or
+        MeetingViewsOptions.NO_TEXT_PASSWORD or
+        MeetingViewsOptions.NO_BUTTON_INVITE or
+        MeetingViewsOptions.NO_BUTTON_SHARE or
+        MeetingViewsOptions.NO_BUTTON_MORE or
+        MeetingViewsOptions.NO_BUTTON_PARTICIPANTS
+    no_invite = true
+    no_share = true
+    invite_options = InviteOptions.INVITE_DISABLE_ALL
+   
+}
 
     val meetingService = zoomSDK.meetingService
     activityBinding?.activity?.let {
