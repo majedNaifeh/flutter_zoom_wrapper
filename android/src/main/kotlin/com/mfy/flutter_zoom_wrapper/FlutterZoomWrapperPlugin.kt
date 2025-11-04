@@ -174,6 +174,7 @@ private fun joinMeeting(meetingId: String?, password: String?, displayName: Stri
     meeting_views_options = 
         MeetingViewsOptions.NO_TEXT_MEETING_ID or
         MeetingViewsOptions.NO_TEXT_PASSWORD or
+     MeetingViewsOptions.NO_TEXT_INVITE_LINK or
         MeetingViewsOptions.NO_BUTTON_INVITE or
         MeetingViewsOptions.NO_BUTTON_SHARE or
         MeetingViewsOptions.NO_BUTTON_MORE or
