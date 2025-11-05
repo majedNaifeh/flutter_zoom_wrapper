@@ -51,16 +51,11 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
   }
 
   private fun initZoom(jwt: String, result: MethodChannel.Result) {
+    //Log.d("ZOOM_SDK", "JWT Token received: $jwt")
+   // Log.d("ZOOM_SDK", "JWT Token length: ${jwt.length}")
     zoomSDK = ZoomSDK.getInstance()
 
     if (zoomSDK.isInitialized) {
-      // Hide invite URL even if already initialized
-      try {
-        zoomSDK.meetingSettingsHelper?.hideMeetingInviteUrl(true)
-        Log.d("Zoom", "✅ Invite URL hidden after init check")
-      } catch (e: Exception) {
-        Log.e("Zoom", "❌ Error hiding invite URL: ${e.message}")
-      }
       result.success(true)
       return
     }
@@ -82,13 +77,6 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
     val listener = object : ZoomSDKInitializeListener {
       override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
         if (errorCode == ZoomError.ZOOM_ERROR_SUCCESS) {
-          // Hide invite URL immediately after successful initialization
-          try {
-            zoomSDK.meetingSettingsHelper?.hideMeetingInviteUrl(true)
-            Log.d("Zoom", "✅ Invite URL hidden after SDK init")
-          } catch (e: Exception) {
-            Log.e("Zoom", "❌ Error hiding invite URL: ${e.message}")
-          }
           result.success(true)
         } else {
           result.error("INIT_ERROR", "Failed to initialize Zoom SDK. Error: $errorCode, internalErrorCode: $internalErrorCode", null)
@@ -103,7 +91,69 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
     zoomSDK.initialize(activity, listener, initParams)
   }
 
-  private fun joinMeeting(meetingId: String?, password: String?, displayName: String?, result: Result) {
+  private fun initZooms(jwt: String, result: MethodChannel.Result) {
+    Log.d("ZOOM_SDK", "JWT Token received: $jwt")
+    Log.d("ZOOM_SDK", "JWT Token length: ${jwt.length}")
+    zoomSDK = ZoomSDK.getInstance()
+
+    try {
+      // Check if SDK is already initialized
+      if (zoomSDK.isInitialized()){
+        Log.d("ZOOM_SDK", "Zoom SDK already initialized")
+        result.success(true)
+      }
+      // Only initialize if not already initialized
+      if (!zoomSDK.isInitialized()) {
+        // Configure SDK initialization parameters
+        var initParams =  ZoomSDKInitParams()
+        initParams.jwtToken = jwt;
+        initParams.enableLog = true;
+        initParams.enableGenerateDump = true;
+        initParams.logSize = 5;
+        initParams.domain="zoom.us";
+        initParams.videoRawDataMemoryMode = ZoomSDKRawDataMemoryMode.ZoomSDKRawDataMemoryModeStack;
+
+        // Create listener for initialization callbacks
+        val listener = object : ZoomSDKInitializeListener {
+          /**
+           * Callback for SDK initialization result
+           * @param errorCode Error code from initialization
+           * @param internalErrorCode Internal error code from initialization
+           */
+          override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
+            if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
+              Log.d("Failed", "Failed to initialize Zoom SDK")
+              Log.d(
+                "Failed to initialize Zoom SDK. Error: \" + $errorCode + \"",
+                "internalErrorCode=\" + $internalErrorCode"
+              )
+              return result.error("INIT_ERROR", "\"Failed to initialize Zoom SDK. Error: \" + $errorCode + \",\n" +
+                      "\"internalErrorCode=\" + $internalErrorCode\"", null)
+            } else {
+              Log.d("Success", "Initialize Zoom SDK successfully.")
+              return result.success(true)
+            }
+          }
+
+          /**
+           * Callback when Zoom auth identity expires
+           */
+          override fun onZoomAuthIdentityExpired() {
+
+          }
+        }
+
+        // Initialize SDK with prepared parameters
+        zoomSDK.initialize(context, listener, initParams)
+
+      }
+    } catch (e: Exception) {
+      Log.e("ZOOM_SDK", "Error while initializing ZoomSDK: ${e.message}", e)
+      result.error("INIT_ERROR", "Failed to initialize Zoom SDK: ${e.message}", null)
+    }
+  }
+
+private fun joinMeeting(meetingId: String?, password: String?, displayName: String?, result: Result) {
     if (!zoomSDK.isInitialized) {
       result.error("SDK_NOT_INITIALIZED", "Zoom SDK not initialized", null)
       return
@@ -114,36 +164,31 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
       return
     }
 
-    // Hide invite URL right before joining meeting
-    try {
-      zoomSDK.meetingSettingsHelper?.hideMeetingInviteUrl(true)
-      Log.d("Zoom", "✅ Invite URL hidden before joining meeting")
-    } catch (e: Exception) {
-      Log.e("Zoom", "❌ Error hiding invite URL before join: ${e.message}")
-    }
-
     val joinParams = JoinMeetingParams().apply {
       meetingNo = meetingId
       this.password = password
       this.displayName = displayName
     }
 
-    val options = JoinMeetingOptions().apply {
-      no_titlebar = true
-      no_invite = true
-      no_share = true
-      invite_options = InviteOptions.INVITE_DISABLE_ALL
-      meeting_views_options = 
-          MeetingViewsOptions.NO_TEXT_MEETING_ID or
-          MeetingViewsOptions.NO_TEXT_PASSWORD or
-          MeetingViewsOptions.NO_BUTTON_INVITE or
-          MeetingViewsOptions.NO_BUTTON_SHARE or
-          MeetingViewsOptions.NO_BUTTON_MORE or
-          MeetingViewsOptions.NO_BUTTON_PARTICIPANTS or
-          MeetingViewsOptions.NO_TEXT_INVITE or 
-          MeetingViewsOptions.NO_BUTTON_INVITE_LINK or
-          MeetingViewsOptions.NO_BUTTON_MEETING_INFO
-    }
+
+
+   val options = JoinMeetingOptions().apply {
+    no_titlebar = true
+    no_invite = true
+    no_share = true
+    invite_options = InviteOptions.INVITE_DISABLE_ALL
+    meeting_views_options = 
+        MeetingViewsOptions.NO_TEXT_MEETING_ID or
+        MeetingViewsOptions.NO_TEXT_PASSWORD or
+        MeetingViewsOptions.NO_BUTTON_INVITE or
+        MeetingViewsOptions.NO_BUTTON_SHARE or
+        MeetingViewsOptions.NO_BUTTON_MORE or
+        MeetingViewsOptions.NO_BUTTON_PARTICIPANTS or
+        MeetingViewsOptions.NO_TEXT_INVITE or 
+        MeetingViewsOptions.NO_BUTTON_INVITE_LINK or
+        MeetingViewsOptions.NO_BUTTON_MEETING_INFO
+   
+}
 
     val meetingService = zoomSDK.meetingService
     activityBinding?.activity?.let {
@@ -154,19 +199,12 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
 
     result.success(true)
   }
-
   override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
     when (errorCode) {
       ZoomError.ZOOM_ERROR_SUCCESS -> {
         Log.d("Zoom", "✅ Zoom SDK initialized successfully.")
-        // Hide invite URL here as well for redundancy
-        try {
-          zoomSDK.meetingSettingsHelper?.hideMeetingInviteUrl(true)
-        } catch (e: Exception) {
-          Log.e("Zoom", "❌ Error in onZoomSDKInitializeResult: ${e.message}")
-        }
       }
-      1001 -> {
+      1001 -> { // Numeric value for ZOOM_ERROR_WRONG_ZOOM_DOMAIN
         Log.e("Zoom", "❌ Wrong Zoom domain configured")
       }
       else -> {
@@ -174,6 +212,8 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
       }
     }
   }
+
+
 
   override fun onZoomAuthIdentityExpired() {
     Log.w("Zoom", "Auth identity expired")
