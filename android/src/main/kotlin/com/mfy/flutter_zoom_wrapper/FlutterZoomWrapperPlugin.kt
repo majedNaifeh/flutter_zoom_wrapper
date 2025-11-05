@@ -78,8 +78,6 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
     val listener = object : ZoomSDKInitializeListener {
       override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
         if (errorCode == ZoomError.ZOOM_ERROR_SUCCESS) {
-                      ZoomSDK.getInstance().getZoomUIService().hideMeetingInviteUrl(true);
-
           result.success(true)
         } else {
           result.error("INIT_ERROR", "Failed to initialize Zoom SDK. Error: $errorCode, internalErrorCode: $internalErrorCode", null)
@@ -133,7 +131,6 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
               return result.error("INIT_ERROR", "\"Failed to initialize Zoom SDK. Error: \" + $errorCode + \",\n" +
                       "\"internalErrorCode=\" + $internalErrorCode\"", null)
             } else {
-                          ZoomSDK.getInstance().getZoomUIService().hideMeetingInviteUrl(true);
 
               Log.d("Success", "Initialize Zoom SDK successfully.")
               return result.success(true)
