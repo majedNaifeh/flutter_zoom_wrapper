@@ -176,7 +176,6 @@ private fun joinMeeting(meetingId: String?, password: String?, displayName: Stri
 
 
    val options = JoinMeetingOptions().apply {
-    no_titlebar = true
     no_invite = true
     no_share = true
     invite_options = InviteOptions.INVITE_DISABLE_ALL
@@ -187,9 +186,8 @@ private fun joinMeeting(meetingId: String?, password: String?, displayName: Stri
         MeetingViewsOptions.NO_BUTTON_SHARE or
         MeetingViewsOptions.NO_BUTTON_MORE or
         MeetingViewsOptions.NO_BUTTON_PARTICIPANTS or
-        MeetingViewsOptions.NO_TEXT_INVITE or 
         MeetingViewsOptions.NO_BUTTON_INVITE_LINK or
-        MeetingViewsOptions.NO_BUTTON_MEETING_INFO
+ 
    
 }
 
