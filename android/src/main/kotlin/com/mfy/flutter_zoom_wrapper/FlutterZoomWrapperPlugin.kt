@@ -130,6 +130,8 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
               return result.error("INIT_ERROR", "\"Failed to initialize Zoom SDK. Error: \" + $errorCode + \",\n" +
                       "\"internalErrorCode=\" + $internalErrorCode\"", null)
             } else {
+                          ZoomSDK.getInstance().getZoomUIService().hideMeetingInviteUrl(true);
+
               Log.d("Success", "Initialize Zoom SDK successfully.")
               return result.success(true)
             }
