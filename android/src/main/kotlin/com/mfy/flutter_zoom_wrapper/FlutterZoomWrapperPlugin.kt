@@ -153,52 +153,106 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
     }
   }
 
+// private fun joinMeeting(meetingId: String?, password: String?, displayName: String?, result: Result) {
+//     if (!zoomSDK.isInitialized) {
+//       result.error("SDK_NOT_INITIALIZED", "Zoom SDK not initialized", null)
+//       return
+//     }
+
+//     if (meetingId.isNullOrEmpty() || password.isNullOrEmpty() || displayName.isNullOrEmpty()) {
+//       result.error("INVALID_ARGUMENTS", "Missing meeting details", null)
+//       return
+//     }
+
+//     val joinParams = JoinMeetingParams().apply {
+//       meetingNo = meetingId
+//       this.password = password
+//       this.displayName = displayName
+//     }
+
+
+
+//    val options = JoinMeetingOptions().apply {
+//     no_titlebar = true
+//     no_invite = true
+//     no_share = true
+//     invite_options = InviteOptions.INVITE_DISABLE_ALL
+//     meeting_views_options = 
+//         MeetingViewsOptions.NO_TEXT_MEETING_ID or
+//         MeetingViewsOptions.NO_TEXT_PASSWORD or
+//         MeetingViewsOptions.NO_BUTTON_INVITE or
+//         MeetingViewsOptions.NO_BUTTON_SHARE or
+//         MeetingViewsOptions.NO_BUTTON_MORE or
+//         MeetingViewsOptions.NO_BUTTON_PARTICIPANTS or
+//         MeetingViewsOptions.NO_TEXT_INVITE or 
+//         MeetingViewsOptions.NO_BUTTON_INVITE_LINK or
+//         MeetingViewsOptions.NO_BUTTON_MEETING_INFO
+   
+// }
+
+//     val meetingService = zoomSDK.meetingService
+//     activityBinding?.activity?.let {
+//       meetingService.joinMeetingWithParams(it, joinParams, options)
+//     } ?: run {
+//       meetingService.joinMeetingWithParams(context, joinParams, options)
+//     }
+
+//     result.success(true)
+//   }
+
 private fun joinMeeting(meetingId: String?, password: String?, displayName: String?, result: Result) {
     if (!zoomSDK.isInitialized) {
-      result.error("SDK_NOT_INITIALIZED", "Zoom SDK not initialized", null)
-      return
+        result.error("SDK_NOT_INITIALIZED", "Zoom SDK not initialized", null)
+        return
     }
 
     if (meetingId.isNullOrEmpty() || password.isNullOrEmpty() || displayName.isNullOrEmpty()) {
-      result.error("INVALID_ARGUMENTS", "Missing meeting details", null)
-      return
+        result.error("INVALID_ARGUMENTS", "Missing meeting details", null)
+        return
     }
 
+    // --- Correct calls to SDK helpers (must be before join) ---
+    val meetingSettingsHelper = zoomSDK.getMeetingSettingsHelper()
+    meetingSettingsHelper?.disableCopyMeetingUrl(true)    // disable copy URL from title-bar long-press / menu
+    meetingSettingsHelper?.setNoInviteH323RoomCallInEnabled(true) // other invite H323/room settings if needed
+
+    val uiService = zoomSDK.getZoomUIService()
+    uiService?.hideMeetingInviteUrl(true)                 // hide the "Invite URL" section in the meeting info popup
+    // Note: some hide/disable functions exist under ZoomUIService or MeetingSettingsHelper depending on SDK version
+
+    // --- Join params & options (your existing code) ---
     val joinParams = JoinMeetingParams().apply {
-      meetingNo = meetingId
-      this.password = password
-      this.displayName = displayName
+        meetingNo = meetingId
+        this.password = password
+        this.displayName = displayName
     }
 
-
-
-   val options = JoinMeetingOptions().apply {
-    no_titlebar = true
-    no_invite = true
-    no_share = true
-    invite_options = InviteOptions.INVITE_DISABLE_ALL
-    meeting_views_options = 
-        MeetingViewsOptions.NO_TEXT_MEETING_ID or
-        MeetingViewsOptions.NO_TEXT_PASSWORD or
-        MeetingViewsOptions.NO_BUTTON_INVITE or
-        MeetingViewsOptions.NO_BUTTON_SHARE or
-        MeetingViewsOptions.NO_BUTTON_MORE or
-        MeetingViewsOptions.NO_BUTTON_PARTICIPANTS or
-        MeetingViewsOptions.NO_TEXT_INVITE or 
-        MeetingViewsOptions.NO_BUTTON_INVITE_LINK or
-        MeetingViewsOptions.NO_BUTTON_MEETING_INFO
-   
-}
+    val options = JoinMeetingOptions().apply {
+        no_titlebar = true
+        no_invite = true
+        no_share = true
+        invite_options = InviteOptions.INVITE_DISABLE_ALL
+        meeting_views_options =
+            MeetingViewsOptions.NO_TEXT_MEETING_ID or
+            MeetingViewsOptions.NO_TEXT_PASSWORD or
+            MeetingViewsOptions.NO_BUTTON_INVITE or
+            MeetingViewsOptions.NO_BUTTON_SHARE or
+            MeetingViewsOptions.NO_BUTTON_MORE or
+            MeetingViewsOptions.NO_BUTTON_PARTICIPANTS or
+            MeetingViewsOptions.NO_TEXT_INVITE or
+            MeetingViewsOptions.NO_BUTTON_INVITE_LINK or
+            MeetingViewsOptions.NO_BUTTON_MEETING_INFO
+    }
 
     val meetingService = zoomSDK.meetingService
     activityBinding?.activity?.let {
-      meetingService.joinMeetingWithParams(it, joinParams, options)
+        meetingService.joinMeetingWithParams(it, joinParams, options)
     } ?: run {
-      meetingService.joinMeetingWithParams(context, joinParams, options)
+        meetingService.joinMeetingWithParams(context, joinParams, options)
     }
 
     result.success(true)
-  }
+}
 
   override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
     when (errorCode) {
