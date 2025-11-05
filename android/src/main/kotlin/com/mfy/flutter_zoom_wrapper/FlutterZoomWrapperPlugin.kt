@@ -153,6 +153,9 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
     }
   }
 
+
+
+
 private fun joinMeeting(meetingId: String?, password: String?, displayName: String?, result: Result) {
     if (!zoomSDK.isInitialized) {
       result.error("SDK_NOT_INITIALIZED", "Zoom SDK not initialized", null)
@@ -199,7 +202,6 @@ private fun joinMeeting(meetingId: String?, password: String?, displayName: Stri
 
     result.success(true)
   }
-
   override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
     when (errorCode) {
       ZoomError.ZOOM_ERROR_SUCCESS -> {
@@ -213,6 +215,7 @@ private fun joinMeeting(meetingId: String?, password: String?, displayName: Stri
       }
     }
   }
+
 
 
   override fun onZoomAuthIdentityExpired() {
