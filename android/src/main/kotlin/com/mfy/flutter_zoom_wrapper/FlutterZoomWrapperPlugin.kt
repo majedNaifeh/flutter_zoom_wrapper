@@ -200,20 +200,51 @@ private fun joinMeeting(meetingId: String?, password: String?, displayName: Stri
     result.success(true)
   }
 
+  // override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
+  //   when (errorCode) {
+  //     ZoomError.ZOOM_ERROR_SUCCESS -> {
+  //       Log.d("Zoom", "✅ Zoom SDK initialized successfully.")
+  //     }
+  //     1001 -> { // Numeric value for ZOOM_ERROR_WRONG_ZOOM_DOMAIN
+  //       Log.e("Zoom", "❌ Wrong Zoom domain configured")
+  //     }
+  //     else -> {
+  //       Log.e("Zoom", "❌ Zoom SDK initialization failed. Error code: $errorCode, Internal error: $internalErrorCode")
+  //     }
+  //   }
+  // }
+
   override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
     when (errorCode) {
-      ZoomError.ZOOM_ERROR_SUCCESS -> {
-        Log.d("Zoom", "✅ Zoom SDK initialized successfully.")
-      }
-      1001 -> { // Numeric value for ZOOM_ERROR_WRONG_ZOOM_DOMAIN
-        Log.e("Zoom", "❌ Wrong Zoom domain configured")
-      }
-      else -> {
-        Log.e("Zoom", "❌ Zoom SDK initialization failed. Error code: $errorCode, Internal error: $internalErrorCode")
-      }
-    }
-  }
+        ZoomError.ZOOM_ERROR_SUCCESS -> {
+            Log.d("Zoom", "✅ Zoom SDK initialized successfully.")
 
+            try {
+                // ✅ Hide the invite link in the meeting top bar (green info popup)
+                zoomSDK.zoomUIService.hideMeetingInviteUrl(true)
+
+                // ✅ Also disable other possible invite link access methods
+                zoomSDK.meetingSettingsHelper.disableCopyMeetingUrl(true)
+                zoomSDK.meetingSettingsHelper.disableShowMeetingInviteUrl(true)
+
+                Log.d("Zoom", "✅ Invite link and info button hidden successfully.")
+            } catch (e: Exception) {
+                Log.e("Zoom", "⚠️ Failed to hide invite link: ${e.message}")
+            }
+        }
+
+        1001 -> {
+            Log.e("Zoom", "❌ Wrong Zoom domain configured")
+        }
+
+        else -> {
+            Log.e(
+                "Zoom",
+                "❌ Zoom SDK initialization failed. Error code: $errorCode, Internal error: $internalErrorCode"
+            )
+        }
+    }
+}
 
 
   override fun onZoomAuthIdentityExpired() {
