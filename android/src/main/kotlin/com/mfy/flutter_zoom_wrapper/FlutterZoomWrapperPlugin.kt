@@ -100,7 +100,6 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
       // Check if SDK is already initialized
       if (zoomSDK.isInitialized()){
         Log.d("ZOOM_SDK", "Zoom SDK already initialized")
-
         result.success(true)
       }
       // Only initialize if not already initialized
@@ -154,9 +153,6 @@ class FlutterZoomWrapperPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
     }
   }
 
-
-
-
 private fun joinMeeting(meetingId: String?, password: String?, displayName: String?, result: Result) {
     if (!zoomSDK.isInitialized) {
       result.error("SDK_NOT_INITIALIZED", "Zoom SDK not initialized", null)
@@ -174,25 +170,22 @@ private fun joinMeeting(meetingId: String?, password: String?, displayName: Stri
       this.displayName = displayName
     }
 
+    val options = JoinMeetingOptions().apply {
+      // Hide password, meeting ID, and invite link from meeting info popup
+      meeting_views_options = MeetingViewsOptions.NO_TEXT_PASSWORD or 
+                              MeetingViewsOptions.NO_TEXT_MEETING_ID or
+                              MeetingViewsOptions.NO_BUTTON_PARTICIPANTS
+      
+      no_invite = true
+      no_share = true
+      zoomSDK.zoomUIService.hideMeetingInviteUrl(true)
+
+//      no_titlebar=true
+    }
+  zoomSDK.zoomUIService.hideMeetingInviteUrl(true)
 
 
-   val options = JoinMeetingOptions().apply {
-    no_invite = true
-    no_share = true
-    invite_options = InviteOptions.INVITE_DISABLE_ALL
-    meeting_views_options = 
-        MeetingViewsOptions.NO_TEXT_MEETING_ID or
-        MeetingViewsOptions.NO_TEXT_PASSWORD or
-        MeetingViewsOptions.NO_BUTTON_INVITE or
-        MeetingViewsOptions.NO_BUTTON_SHARE or
-        MeetingViewsOptions.NO_BUTTON_MORE or
-        MeetingViewsOptions.NO_BUTTON_PARTICIPANTS or
-        MeetingViewsOptions.NO_BUTTON_INVITE_LINK
- 
-   
-}
-
-    val meetingService = zoomSDK.meetingService
+  val meetingService = zoomSDK.meetingService
     activityBinding?.activity?.let {
       meetingService.joinMeetingWithParams(it, joinParams, options)
     } ?: run {
@@ -204,6 +197,8 @@ private fun joinMeeting(meetingId: String?, password: String?, displayName: Stri
   override fun onZoomSDKInitializeResult(errorCode: Int, internalErrorCode: Int) {
     when (errorCode) {
       ZoomError.ZOOM_ERROR_SUCCESS -> {
+        zoomSDK.zoomUIService.hideMeetingInviteUrl(true)
+
         Log.d("Zoom", "✅ Zoom SDK initialized successfully.")
       }
       1001 -> { // Numeric value for ZOOM_ERROR_WRONG_ZOOM_DOMAIN
