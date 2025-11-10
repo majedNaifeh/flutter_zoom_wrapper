@@ -70,39 +70,29 @@ public class FlutterZoomWrapperPlugin: NSObject, FlutterPlugin,MobileRTCAuthDele
                  resultHolder = nil
              }
 
-             // private func joinMeeting(meetingId: String, password: String, displayName: String, result: @escaping FlutterResult) {
-             //         guard let meetingService = MobileRTC.shared().getMeetingService() else {
-             //             result(FlutterError(code: "NO_MEETING_SERVICE", message: "Meeting service is not available", details: nil))
-             //             return
-             //         }
-
-             //         let joinParams = MobileRTCMeetingJoinParam()
-             //         joinParams.userName = displayName
-             //         joinParams.meetingNumber = meetingId
-             //         joinParams.password = password
-
-             //         let response = meetingService.joinMeeting(with: joinParams)
-             //         result(response == MobileRTCMeetError.success)
-             //     }
     private func joinMeeting(meetingId: String, password: String, displayName: String, result: @escaping FlutterResult) {
-    guard let meetingService = MobileRTC.shared().getMeetingService() else {
-        result(FlutterError(code: "NO_MEETING_SERVICE", message: "Meeting service is not available", details: nil))
-        return
+        guard let meetingService = MobileRTC.shared().getMeetingService() else {
+            result(FlutterError(code: "NO_MEETING_SERVICE", message: "Meeting service is not available", details: nil))
+            return
+        }
+
+        // Configure meeting settings before joining
+        if let meetingSettings = MobileRTC.shared().getMeetingSettings() {
+            meetingSettings.meetingInviteHidden = true
+            meetingSettings.meetingInviteUrlHidden = true
+            meetingSettings.meetingPasswordHidden = true
+            meetingSettings.meetingParticipantHidden = true
+
+
+        }
+   
+
+        let joinParams = MobileRTCMeetingJoinParam()
+        joinParams.userName = displayName
+        joinParams.meetingNumber = meetingId
+        joinParams.password = password
+
+        let response = meetingService.joinMeeting(with: joinParams)
+        result(response == MobileRTCMeetError.success)
     }
-
-    // Configure meeting settings before joining
-    if let meetingSettings = MobileRTC.shared().getMeetingSettings() {
-        meetingSettings.meetingInviteHidden = true
-        meetingSettings.meetingInviteUrlHidden = true
-        meetingSettings.meetingPasswordHidden = true
-    }
-
-    let joinParams = MobileRTCMeetingJoinParam()
-    joinParams.userName = displayName
-    joinParams.meetingNumber = meetingId
-    joinParams.password = password
-
-    let response = meetingService.joinMeeting(with: joinParams)
-    result(response == MobileRTCMeetError.success)
-}
 }
