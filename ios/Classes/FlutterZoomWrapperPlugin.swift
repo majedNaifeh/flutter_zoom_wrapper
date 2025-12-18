@@ -82,7 +82,6 @@ public class FlutterZoomWrapperPlugin: NSObject, FlutterPlugin,MobileRTCAuthDele
             meetingSettings.meetingInviteUrlHidden = true
             meetingSettings.meetingPasswordHidden = true
             meetingSettings.meetingParticipantHidden = true
-                       meetingSettings.enableVideoCallPicture(inPicture: true)
 
 
 
